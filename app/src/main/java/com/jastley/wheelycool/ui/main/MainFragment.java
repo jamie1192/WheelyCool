@@ -115,4 +115,17 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
         wordRecyclerAdapter.removeWord(pos);
         mViewModel.deleteWord(wvh.getWord());
     }
+
+    @OnClick(R.id.done_button)
+    public void doneButtonClick() {
+        if(getActivity() != null) {
+
+            Fragment wheelFragment = WheelFragment.newInstance();
+
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, wheelFragment, "WHEEL_FRAGMENT")
+                    .commitNow();
+
+        }
+    }
 }
