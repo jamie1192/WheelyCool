@@ -30,16 +30,12 @@
        android:src="@drawable/wheel_centre"
        />
 
-    <!--<TextView-->
-        <!--android:layout_width="150dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="One word"-->
-        <!--android:textAlignment="viewEnd"-->
-        <!--android:textColor="@color/colorWhite"-->
-        <!--app:layout_constraintCircle="@id/center_guideline"-->
-        <!--app:layout_constraintCircleRadius="70dp"-->
-        <!--app:layout_constraintCircleAngle="284"-->
-        <!--android:rotation="194"-->
-        <!--/>-->
+    <Button
+        android:id="@+id/spin_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/spinWheel"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,6 +16,7 @@
         app:layout_constraintEnd_toStartOf="@id/insert_word_button"
         android:hint="@string/addWord"
         android:inputType="text"
+        android:imeOptions="actionDone"
         />
 
     <Button
@@ -44,6 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:text="@string/done"
+        android:enabled="false"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

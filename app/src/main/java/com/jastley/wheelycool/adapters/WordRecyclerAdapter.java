@@ -25,7 +25,7 @@ public class WordRecyclerAdapter extends RecyclerView.Adapter<WordViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull WordViewHolder holder, int position) {
-        holder.setPosition(position);
+        holder.setPositionCounter(position + 1);
         holder.setWord(words.get(position).getWord());
     }
 

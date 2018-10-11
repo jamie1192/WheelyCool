@@ -5,6 +5,7 @@ import android.util.Log;
 import com.jastley.wheelycool.database.AppDatabase;
 import com.jastley.wheelycool.database.entities.Word;
 import com.jastley.wheelycool.di.App;
+import com.jastley.wheelycool.utils.SingleLiveEvent;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class WordRepository {
+
+    SingleLiveEvent<String> snackbarMessage = new SingleLiveEvent<>();
 
     @Inject
     AppDatabase appDatabase;
@@ -58,6 +61,7 @@ public class WordRepository {
             @Override
             public void onError(Throwable e) {
                 Log.e("ADD_WORD", e.getMessage());
+                snackbarMessage.postValue("An error occurred while trying to save word");
             }
         });
 
@@ -84,7 +88,12 @@ public class WordRepository {
             @Override
             public void onError(Throwable e) {
                 Log.e("DELETE_WORD", e.getMessage());
+                snackbarMessage.postValue("An error occurred while trying to delete word");
             }
         });
+    }
+
+    public SingleLiveEvent<String> getSnackbarMessage() {
+        return snackbarMessage;
     }
 }

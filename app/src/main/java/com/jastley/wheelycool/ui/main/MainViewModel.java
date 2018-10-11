@@ -3,6 +3,7 @@ package com.jastley.wheelycool.ui.main;
 import com.jastley.wheelycool.database.entities.Word;
 import com.jastley.wheelycool.di.App;
 import com.jastley.wheelycool.repositories.WordRepository;
+import com.jastley.wheelycool.utils.SingleLiveEvent;
 
 import java.util.List;
 
@@ -13,7 +14,10 @@ import androidx.lifecycle.ViewModel;
 
 public class MainViewModel extends ViewModel {
 
-    LiveData<List<Word>> wordList;
+    private LiveData<List<Word>> wordList;
+
+    //SingleLiveEvent class for error/snackbar messages to prevent firing more than once in app/fragment lifecycle
+    private SingleLiveEvent<String> snackBarMessage;
 
     @Inject
     WordRepository repository;
@@ -32,5 +36,9 @@ public class MainViewModel extends ViewModel {
 
     public void deleteWord(String word) {
         repository.deleteWord(word);
+    }
+
+    public SingleLiveEvent<String> getSnackBarMessage() {
+        return snackBarMessage = repository.getSnackbarMessage();
     }
 }

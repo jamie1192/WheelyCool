@@ -23,7 +23,7 @@ public class WordViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    public void setPosition(int position) {
+    public void setPositionCounter(int position) {
         this.position.setText(String.valueOf(position));
     }
 

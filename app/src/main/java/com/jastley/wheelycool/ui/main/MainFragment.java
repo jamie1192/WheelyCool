@@ -1,15 +1,8 @@
 package com.jastley.wheelycool.ui.main;
 
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,13 +15,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.jastley.wheelycool.R;
 import com.jastley.wheelycool.adapters.WordRecyclerAdapter;
 import com.jastley.wheelycool.database.entities.Word;
@@ -57,10 +54,14 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
                              @Nullable Bundle savedInstanceState) {
 
         View mView = inflater.inflate(R.layout.main_fragment, container, false);
-
         ButterKnife.bind(this, mView);
-
         return mView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initialiseRecyclerView();
     }
 
     @Override
@@ -68,16 +69,11 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
+        setupOnEnterListener();
         loadWords();
+        setupSnackbar();
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        initialiseRecyclerView();
-
-    }
 
     private void initialiseRecyclerView() {
         wordRecyclerAdapter = new WordRecyclerAdapter();
@@ -92,10 +88,20 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
         mViewModel.getWordList().observe(getActivity(), new Observer<List<Word>>() {
             @Override
             public void onChanged(List<Word> words) {
-                wordRecyclerAdapter.setWordList(words);
-                if(words.size() == 5) {
-                    insertButton.setEnabled(false);
+                if(!words.isEmpty()) {
+                    wordRecyclerAdapter.setWordList(words);
+                    doneButton.setEnabled(true);
                 }
+            }
+        });
+    }
+
+    private void setupSnackbar() {
+        mViewModel.getSnackBarMessage().observe(getActivity(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                Snackbar.make(getView(), s, Snackbar.LENGTH_LONG)
+                        .show();
             }
         });
     }
@@ -103,9 +109,26 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
     @OnClick(R.id.insert_word_button)
     public void addNewWord() {
         if(!newWordEditText.getText().toString().trim().equals("")) {
-            mViewModel.addWord(newWordEditText.getText().toString());
-            newWordEditText.getText().clear();
+            saveWord(newWordEditText.getText().toString());
         }
+    }
+
+    private void setupOnEnterListener() {
+        newWordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if(i == EditorInfo.IME_ACTION_DONE
+                        && !newWordEditText.getText().toString().trim().equals("")) {
+                    saveWord(newWordEditText.getText().toString());
+                }
+                return false;
+            }
+        });
+    }
+
+    private void saveWord(String text) {
+        mViewModel.addWord(text);
+        newWordEditText.getText().clear();
     }
 
     @Override
@@ -114,6 +137,11 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
         final int pos = viewHolder.getAdapterPosition();
         wordRecyclerAdapter.removeWord(pos);
         mViewModel.deleteWord(wvh.getWord());
+
+        //disable button if all words have been deleted
+        if(wordRecyclerAdapter.getItemCount() == 0) {
+            doneButton.setEnabled(false);
+        }
     }
 
     @OnClick(R.id.done_button)
@@ -124,7 +152,8 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
 
             getActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, wheelFragment, "WHEEL_FRAGMENT")
-                    .commitNow();
+                    .addToBackStack("WORD_INPUT")
+                    .commit();
 
         }
     }
