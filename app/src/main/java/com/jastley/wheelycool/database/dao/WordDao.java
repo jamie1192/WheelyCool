@@ -4,10 +4,10 @@ import com.jastley.wheelycool.database.entities.Word;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import io.reactivex.Maybe;
 
 @Dao
 public interface WordDao {
@@ -16,7 +16,7 @@ public interface WordDao {
     void insertWord(Word word);
 
     @Query("SELECT * FROM Word")
-    Maybe<List<Word>> getAllWords();
+    LiveData<List<Word>> getAllWords();
 
     @Query("DELETE FROM Word WHERE word = :word")
     void deleteWord(String word);

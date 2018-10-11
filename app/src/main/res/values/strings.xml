@@ -2,4 +2,5 @@
     <string name="app_name">WheelyCool</string>
     <string name="addWord">Add Word…</string>
     <string name="done">Done</string>
+    <string name="delete">DELETE</string>
 </resources>
