@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WheelyCool</string>
+    <string name="app_name">Wheely Cool</string>
     <string name="addWord">Add Word…</string>
     <string name="done">Done</string>
     <string name="delete">DELETE</string>
@@ -7,4 +7,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="spinWheel">Spin the wheel!</string>
+    <string name="spinning">Spinning...</string>
+    <string name="delete_all">Delete All</string>
+    <string name="spinWheelTitle">Spin the Wheel!</string>
+    <string name="wheelyCool">Wheely Cool</string>
+    <string name="addWordsHint">Add some words to start spinning!</string>
 </resources>

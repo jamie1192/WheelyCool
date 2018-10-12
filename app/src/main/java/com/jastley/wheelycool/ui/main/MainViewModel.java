@@ -38,6 +38,10 @@ public class MainViewModel extends ViewModel {
         repository.deleteWord(word);
     }
 
+    public void deleteAllWords() {
+        repository.deleteAllWords();
+    }
+
     public SingleLiveEvent<String> getSnackBarMessage() {
         return snackBarMessage = repository.getSnackbarMessage();
     }

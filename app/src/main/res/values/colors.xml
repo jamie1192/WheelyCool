@@ -6,4 +6,5 @@
     <color name="deleteRed">#e53935</color>
     <color name="colorWhite">#ffffff</color>
     <color name="wheelCentre">#512da8</color>
+    <color name="disabled">#757575</color>
 </resources>

@@ -4,26 +4,17 @@ import android.widget.TextView;
 
 public class WordSpinModel {
 
-    private int viewId;
     private String text;
     private int startRotation;
     private int startAngle;
     private TextView textView;
+    private int currentAngle;
 
-    public WordSpinModel(int viewId, String text, int rotation, int angle, TextView textView) {
-        this.viewId = viewId;
+    public WordSpinModel(String text, int rotation, int angle, TextView textView) {
         this.text = text;
         this.startRotation = rotation;
         this.startAngle = angle;
         this.textView = textView;
-    }
-
-    public int getViewId() {
-        return viewId;
-    }
-
-    public void setViewId(int viewId) {
-        this.viewId = viewId;
     }
 
     public String getText() {
@@ -48,5 +39,13 @@ public class WordSpinModel {
 
     public int getStartingAngle() {
         return startAngle;
+    }
+
+    public int getCurrentAngle() {
+        return currentAngle;
+    }
+
+    public void setCurrentAngle(int currentAngle) {
+        this.currentAngle = currentAngle;
     }
 }

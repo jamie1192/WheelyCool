@@ -43,4 +43,9 @@ public class WordRecyclerAdapter extends RecyclerView.Adapter<WordViewHolder> {
         words.remove(pos);
         notifyDataSetChanged();
     }
+
+    public void emptyList() {
+        words.clear();
+        notifyDataSetChanged();
+    }
 }

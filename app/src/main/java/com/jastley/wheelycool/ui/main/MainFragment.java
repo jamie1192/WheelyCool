@@ -17,15 +17,20 @@ import butterknife.OnClick;
 
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.jastley.wheelycool.MainActivity;
 import com.jastley.wheelycool.R;
 import com.jastley.wheelycool.adapters.WordRecyclerAdapter;
 import com.jastley.wheelycool.database.entities.Word;
@@ -40,6 +45,7 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
     @BindView(R.id.insert_word_button) Button insertButton;
     @BindView(R.id.saved_words_recycler) RecyclerView wordsRecyclerView;
     @BindView(R.id.done_button) Button doneButton;
+    @BindView(R.id.empty_list_hint) TextView emptyListHint;
     private MainViewModel mViewModel;
     private WordRecyclerAdapter wordRecyclerAdapter;
 
@@ -62,6 +68,8 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initialiseRecyclerView();
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -74,11 +82,41 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
         setupSnackbar();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        MainActivity activity = (MainActivity)getActivity();
+        if(activity != null) {
+            activity.setActionBarTitle(getString(R.string.wheelyCool));
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_toolbar, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()) {
+
+            case R.id.delete_all:
+                mViewModel.deleteAllWords();
+                wordRecyclerAdapter.emptyList();
+                setupEmptyUi();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void initialiseRecyclerView() {
         wordRecyclerAdapter = new WordRecyclerAdapter();
+        LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.anim_slide_right);
         wordsRecyclerView.setAdapter(wordRecyclerAdapter);
         wordsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        wordsRecyclerView.setLayoutAnimation(animationController);
         ItemTouchHelper.SimpleCallback simpleCallback = new RecyclerSwipeHelper(0, ItemTouchHelper.LEFT, this);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(wordsRecyclerView);
@@ -89,6 +127,7 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
             @Override
             public void onChanged(List<Word> words) {
                 if(!words.isEmpty()) {
+                    emptyListHint.setVisibility(View.GONE);
                     wordRecyclerAdapter.setWordList(words);
                     doneButton.setEnabled(true);
                 }
@@ -131,6 +170,11 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
         newWordEditText.getText().clear();
     }
 
+    private void setupEmptyUi() {
+        doneButton.setEnabled(false);
+        emptyListHint.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         WordViewHolder wvh = (WordViewHolder) viewHolder;
@@ -140,7 +184,7 @@ public class MainFragment extends Fragment implements RecyclerSwipeHelper.SwipeL
 
         //disable button if all words have been deleted
         if(wordRecyclerAdapter.getItemCount() == 0) {
-            doneButton.setEnabled(false);
+            setupEmptyUi();
         }
     }
 

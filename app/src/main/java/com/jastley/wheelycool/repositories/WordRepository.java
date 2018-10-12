@@ -93,6 +93,32 @@ public class WordRepository {
         });
     }
 
+    public void deleteAllWords() {
+        Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                appDatabase.getWordDao().deleteAllWords();
+            }
+        }).subscribeOn(Schedulers.io())
+        .subscribe(new CompletableObserver() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e("DELETE_ALL_WORDS", e.getMessage());
+                snackbarMessage.postValue("An error occurred while trying to delete words");
+            }
+        });
+    }
+
     public SingleLiveEvent<String> getSnackbarMessage() {
         return snackbarMessage;
     }
