@@ -12,4 +12,5 @@
     <string name="spinWheelTitle">Spin the Wheel!</string>
     <string name="wheelyCool">Wheely Cool</string>
     <string name="addWordsHint">Add some words to start spinning!</string>
+    <string name="win_range">Win range:</string>
 </resources>

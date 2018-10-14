@@ -24,6 +24,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jastley.wheelycool.MainActivity;
@@ -31,6 +32,7 @@ import com.jastley.wheelycool.R;
 import com.jastley.wheelycool.database.entities.Word;
 import com.jastley.wheelycool.ui.models.WordSpinModel;
 import com.jastley.wheelycool.utils.DensityCalculator;
+import com.jastley.wheelycool.utils.WheelSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +44,9 @@ public class WheelFragment extends Fragment {
     @BindView(R.id.center_guideline) ImageView centreGuideline;
     @BindView(R.id.wheel_constraint_layout) ConstraintLayout wheelConstraintLayout;
     @BindView(R.id.spin_button) Button spinButton;
-    @BindView(R.id.decrease_window) Button decrementButton;
-    @BindView(R.id.increase_window) Button incrementButton;
-    @BindView(R.id.win_window_value) TextView currentWindowValue;
     @BindView(R.id.spin_result) TextView spinResult;
+    @BindView(R.id.win_window_counter) TextView winCurrentValue;
+    @BindView(R.id.win_window_seekbar) SeekBar winSeekbar;
     private MainViewModel mViewModel;
     private List<WordSpinModel> wordSpinModels = new ArrayList<>();
     private RotateAnimation rotate;
@@ -80,7 +81,6 @@ public class WheelFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupButtons(3);
     }
 
 
@@ -93,7 +93,7 @@ public class WheelFragment extends Fragment {
         // across lifecycle changes (rotation/paused/destroyed)
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         setupWheel();
-
+        setupSeekbarListener();
     }
 
     @Override
@@ -134,8 +134,6 @@ public class WheelFragment extends Fragment {
                     int initAngle = 360 / words.size();
                     int nextAngle = 0;
 
-                    setupButtons(initAngle);
-
                     for (Word word : words) {
 
                         //Calculate angle of rotation for text to compensate for wheel angle position
@@ -167,6 +165,8 @@ public class WheelFragment extends Fragment {
 
                         nextAngle += initAngle;
                     }
+
+                    setupSeekbar();
                 }
             }
         });
@@ -199,54 +199,8 @@ public class WheelFragment extends Fragment {
 
                 int finalDegree = ((currentDegree - startDegree) + 270) % 360;
 
-                int marker = 360 - finalDegree;
-
-                //Calculate max/min and compensate for gap between 359 - >0 if necessary
-                double min = ((marker - (winWindow / 2)) + 360) % 360;
-                double max = ((marker + (winWindow / 2)) + 360) % 360;
-
-                boolean isWin = false;
-
-                //check each word to see which is closest
-                for(WordSpinModel word : wordSpinModels) {
-
-                    if(marker - winWindow < 0 || marker + winWindow > 359) {
-
-                        if(word.getStartingAngle() >= min && word.getStartingAngle() <= max) {
-                            //win
-                            Log.e("word: ", String.valueOf(word.getStartingAngle() + "wins"));
-                            String winText = word.getText() + "!";
-                            spinResult.setText(winText);
-                            isWin = true;
-                        }
-
-                        else if(word.getStartingAngle() >= min && word.getStartingAngle() <= 359) {
-                            //win
-                            Log.e("word: ", String.valueOf(word.getStartingAngle() + "wins"));
-                            String winText = word.getText() + "!";
-                            spinResult.setText(winText);
-                            isWin = true;
-                        }
-
-                        else if(word.getStartingAngle() <= max && word.getStartingAngle() >= 0) {
-                            //win
-                            Log.e("word: ", String.valueOf(word.getStartingAngle() + "wins"));
-                            String winText = word.getText() + "!";
-                            spinResult.setText(winText);
-                            isWin = true;
-                        }
-                    }
-                    else if(word.getStartingAngle() >= min && word.getStartingAngle() <= max) {
-                        //win
-                        Log.e("word: ", String.valueOf(word.getStartingAngle() + "wins"));
-                        String winText = word.getText() + "!";
-                        spinResult.setText(winText);
-                        isWin = true;
-                    }
-                }
-                if(!isWin) {
-                    spinResult.setText("Not within range!");
-                }
+                String resultText = WheelSpinner.getWheelSelection(finalDegree, winWindow, wordSpinModels);
+                spinResult.setText(resultText);
             }
 
             @Override
@@ -257,47 +211,39 @@ public class WheelFragment extends Fragment {
         wheelConstraintLayout.startAnimation(rotate);
     }
 
-    @OnClick(R.id.decrease_window)
-    public void decreaseWinWindow() {
-        winWindow --;
-        setupButtons(winWindow);
+    private void setupSeekbar() {
+        winSeekbar.setMax(360 / wordSpinModels.size());
+        winSeekbar.setProgress(360 / wordSpinModels.size());
     }
 
-    @OnClick(R.id.increase_window)
-    public void increaseWinWindow() {
-        winWindow++;
-        setupButtons(winWindow);
-    }
+    private void setupSeekbarListener() {
+        winSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
-
-    private void setupButtons(int value) {
-
-        if(wordSpinModels.size() != 0) {
-            int maxWindow = 360 / wordSpinModels.size();
-
-            if (value == maxWindow) {
-                decrementButton.setEnabled(true);
-                incrementButton.setEnabled(false);
-                winWindow = value;
-                currentWindowValue.setText(String.valueOf("Win range: " + value + "°"));
-            } else if (value == 1) {
-                decrementButton.setEnabled(false);
-                incrementButton.setEnabled(true);
-                winWindow = value;
-                currentWindowValue.setText(String.valueOf("Win range: " + value + "°"));
-            } else if (value >= 1 && value < maxWindow) {
-                winWindow = value;
-                decrementButton.setEnabled(true);
-                incrementButton.setEnabled(true);
-                currentWindowValue.setText(String.valueOf("Win range: " + value + "°"));
+                //don't allow winWindow to be set to zero
+                if(seekBar.getProgress() < 1) {
+                    seekBar.setProgress(1);
+                    winWindow = 1;
+                    String valueText = "Win range: " + String.valueOf(1) + "°";
+                    winCurrentValue.setText(valueText);
+                } else {
+                    winWindow = i;
+                    String valueText = "Win range: " + String.valueOf(i) + "°";
+                    winCurrentValue.setText(valueText);
+                }
             }
-        }
-        else {
-            winWindow = value;
-            decrementButton.setEnabled(true);
-            incrementButton.setEnabled(true);
-            currentWindowValue.setText(String.valueOf("Win range: " + value + "°"));
-        }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
 }

@@ -9,39 +9,27 @@
     android:layout_margin="10dp"
     >
 
-    <Button
-        android:id="@+id/decrease_window"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="10dp"
-        android:layout_toStartOf="@id/win_window_value"
-        android:background="@android:color/transparent"
-        android:foreground="@drawable/decrease_button_selector"
-        />
-
     <TextView
-        android:id="@+id/win_window_value"
+        android:id="@+id/win_window_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         />
 
-    <Button
-        android:id="@+id/increase_window"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="10dp"
-        android:layout_toEndOf="@id/win_window_value"
-        android:background="@android:color/transparent"
-        android:foreground="@drawable/increment_button_selector"
+    <SeekBar
+        android:id="@+id/win_window_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/win_window_counter"
+        android:layout_marginTop="10dp"
         />
 
     <TextView
         android:id="@+id/spin_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/win_window_value"
+        android:layout_below="@id/win_window_seekbar"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
         android:textSize="20sp"
@@ -91,9 +79,10 @@
 
     <Button
         android:id="@+id/spin_button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:text="@string/spinWheel"
         />
 
